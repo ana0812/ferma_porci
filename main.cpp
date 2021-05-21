@@ -290,6 +290,141 @@ void inserare() {
     registru_adaugare(Guitz.listaBoxe.at(alegere - 1).cod, greutate, data);
 }
 
+void stergere_pt2(int alegere) {
+    cout << "Alegeti cnp-ul porcului: ";
+    vector<int>coduri;
+    int i,c,ok=0;
+
+    //pastram in vectorul coduri cnp urile porcurilor pt a valida daca introduce un cnp corect
+    for (i = 0; i < Guitz.listaBoxe.at(alegere).listaAnimale.size(); i++) {
+        c = Guitz.listaBoxe.at(alegere).listaAnimale.at(i).cnp;
+        coduri.push_back(c);
+        cout << c << " ";
+    }
+    
+    //alege cnp ul
+    while (!ok)
+    {
+        cin >> c;
+        for (i = 0; i < coduri.size(); i++) {
+            if (c == coduri.at(i))
+                ok = 1;
+        }
+        if (ok == 0)
+        {
+            cout << "Ati ales un cnp gresit. Doriti sa incercati din nou?";
+            int optiune;
+            cout << "\nAlegeti 0 pt nu, 1 pt da: ";
+            cin >> optiune;
+            if (optiune == 0) {
+                return;
+            }
+            cout << "Alegeti cnp-ul porcului: ";
+        }
+    }
+}
+
+bool alegere_boxa(const vector<int>&nr, int&alegere){
+    int i,ok = 0;
+    cout << "Ce boxa alegeti? Puneti doar numarul boxei.";
+    while (!ok)
+    {
+        cin >> alegere;
+        for (i = 0; i < nr.size(); i++) {
+            if (alegere == (nr.at(i) + 1))
+                ok = 1;
+        }
+        if (ok == 0)
+        {
+            cout << "Ati ales un numar gresit. Doriti sa incercati din nou?";
+            int optiune;
+            cout << "\nAlegeti 0 pt nu, 1 pt da: ";
+            cin >> optiune;
+            if (optiune == 0) {
+                return false;
+            }
+            cout << "Ce boxa alegeti? Puneti doar numarul boxei.";
+        }
+    }
+}
+
+void stergere() {
+    int alegere, i, ok = 0;
+    cout << "Ce tip de porc doriti sa stergeti?" << endl;
+    cout << "1. Pucelusi\n2. Scroafa\n3. Porc" << endl;
+    cout << "Alegerea dvs este: "; cin >> alegere;
+    vector<int> nr;
+
+    //verificam pt tipul de porc ales daca se poate sterge vreunul
+    //daca se pot sterge pastram in vectorul nr boxele respective
+    //afisam boxele din care se pot sterge porci
+    if (alegere == 1) {
+        for (i = 0; i < Guitz.listaBoxe.size(); i++)
+        {
+            if (!Guitz.listaBoxe.at(i).tip.compare("mic"))
+            {
+                if (Guitz.listaBoxe.at(i).nrPorci > 0)
+                {
+                    cout << Guitz.listaBoxe.at(i).cod << endl;
+                    ok = 1;
+                    nr.push_back(i);
+                }
+            }
+        }
+        if (!ok) {
+            cout << "Ne cerem scuze, nu mai exista porcusori in ferma!";
+            return;
+        }
+    }
+    else if (alegere == 2) {
+        for (i = 0; i < Guitz.listaBoxe.size(); i++)
+        {
+            if (!Guitz.listaBoxe.at(i).tip.compare("mediu"))
+            {
+                if (Guitz.listaBoxe.at(i).nrPorci > 0)
+                {
+                    cout << Guitz.listaBoxe.at(i).cod << endl;
+                    ok = 1;
+                    nr.push_back(i);
+                }
+            }
+        }
+        if (!ok) {
+            cout << "Ne cerem scuze, nu mai exista porcusori in ferma!";
+            return;
+        }
+    }
+    else if (alegere == 3) {
+        for (i = 0; i < Guitz.listaBoxe.size(); i++)
+        {
+            if (!Guitz.listaBoxe.at(i).tip.compare("mare"))
+            {
+                if (Guitz.listaBoxe.at(i).nrPorci > 0)
+                {
+                    cout << Guitz.listaBoxe.at(i).cod << endl;
+                    ok = 1;
+                    nr.push_back(i);
+                }
+            }
+        }
+        if (!ok) {
+            cout << "Ne cerem scuze, nu mai exista porcusori in ferma!";
+            return;
+        }
+    }
+    else {
+        cout << "Nu ati ales o optiune valida. Reveniti in functie";
+        return;
+    }
+
+    //utilizatorul alege numarul boxei din care vrea sa elibereze porci
+    if (!alegere_boxa(nr, alegere))
+        return;
+
+    //aici va trebui sa aleaga porcul pe care vrea sa il elibereze
+    stergere_pt2(alegere - 1);
+}
+
 int main()
 {
     ifstream inFile;
@@ -322,8 +457,9 @@ int main()
     inFile.close();
 
     //cout << Guitz;
-    inserare();
+    //inserare();
     //cout << Guitz;
+    stergere();
 
 	return 0;
 }
