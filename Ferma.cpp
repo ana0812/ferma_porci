@@ -14,9 +14,9 @@ void Ferma::SetLista(Boxa & b)
 }
 
 ostream& operator<<(ostream& st, const Ferma& f) {
-	st << "Nume: " << f.nume << " Locatie: " << f.locatie << endl;
-	st << "Nr Porci: " << f.nrPorci << " " << f.nrScroafe << " " << f.nrPurcelusi << endl;
-	st << "Nr de boxe: " << f.nrBoxe <<" Nr max boxa: " << f.nrMaxBoxePorci << endl;
+	st << "\t\t\t\tNume: " << f.nume << " Locatie: " << f.locatie << endl;
+	st << "\t\t\t\tNr Porci: " << f.nrPorci << " porci, " << f.nrScroafe << " scroafe, " << f.nrPurcelusi <<" purcelusi"<< endl;
+	st << "\t\t\t\tNr total boxe: " << f.nrBoxe <<" Nr max porci/boxa: " << f.nrMaxBoxePorci << endl<<endl;
 	if (f.listaBoxe.size()) {
 		for (int i = 0; i < f.listaBoxe.size(); i++) {
 			st << f.listaBoxe.at(i) << endl;

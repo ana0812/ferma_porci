@@ -21,7 +21,7 @@ public:
 	//functii prietene pt functia de inserare
 	friend void inserare();
 	friend void istoric_adaugare(string, int,string);
-	friend void registru_adaugare(string nrBoxa, int greutate, string data);
+	friend void registru_adaugare(string nrBoxa, int greutate, string data, int cnpnou);
 
 	//functii prietene pt functia de stergere
 	friend void gasire_boxe_stergere(const string marimeBoxa, vector<int>& nr);
@@ -37,5 +37,9 @@ public:
 	//pt desenare
 	friend void functie_ale(int& kmic, int& kmediu, int& kmare);
 	friend void desenare();
+
+	//pt upgrade
+	friend void upgrade();
+	friend bool gasire_boxa_upgrade(const string marimeBoxa, vector<int>& nr);
 };
 

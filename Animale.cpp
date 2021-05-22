@@ -16,6 +16,6 @@ Animale::Animale(string t, int c, float g, string dv)
 
 ostream& operator<<(ostream& os, const Animale&a)
 {
-	os << "Animal: " << a.tip << " CNP: " << a.cnp << endl;
+	os << "\t\t\t\tAnimal: " << a.tip << " CNP: " << a.cnp <<" Greutate:"<<a.greutate<<"kg"<< endl;
 	return os;
 }

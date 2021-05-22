@@ -5,6 +5,7 @@
 #include<fstream>
 #include<vector>
 #include<stdlib.h>
+#include<map>
 using namespace std;
 
 Ferma Guitz;
@@ -79,7 +80,7 @@ void istoric_adaugare(string nrBoxa, int greutate, string data)
             cout << "File renamed successfully";
 }
 
-void registru_adaugare(string nrBoxa, int greutate, string data)
+void registru_adaugare(string nrBoxa, int greutate, string data,int cnpnou)
 {
     ifstream reg;
     reg.open("registru.txt");
@@ -103,7 +104,7 @@ void registru_adaugare(string nrBoxa, int greutate, string data)
                     reg >> cnp >> g >> d;
                     aux << cnp << " " << g << " " << d << endl;
                 }
-                aux << ultimpcnp << " " << greutate << " " << data << endl;
+                aux << cnpnou << " " << greutate << " " << data << endl;
             }
             else {
                 aux << box << " " << tip << " " << nr << endl;
@@ -291,7 +292,7 @@ void inserare() {
     }
 
     istoric_adaugare(Guitz.listaBoxe.at(alegere-1).cod,greutate,data);
-    registru_adaugare(Guitz.listaBoxe.at(alegere - 1).cod, greutate, data);
+    registru_adaugare(Guitz.listaBoxe.at(alegere - 1).cod, greutate, data,ultimpcnp);
 }
 
 //STERGERE
@@ -549,6 +550,234 @@ void stergere() {
     //aici va trebui sa aleaga porcul pe care vrea sa il elibereze
     //parametrii: boxa din care vr sa sterg si tipul de boxa din care vr sa sterg
     stergere_pt2(boxaaleasa-1, alegere);
+}
+
+//pot adauga si in stergere_pt2 - pt upgrade facuta special
+bool alegere_cnp(const vector<int>&coduri, int&c){
+    int i,ok = 0;
+    while (!ok)
+    {
+        cout << "Alegerea dvs este: ";
+        cin >> c;
+        for (i = 0; i < coduri.size(); i++) {
+            if (c == coduri.at(i))
+                ok = 1;
+        }
+        if (ok == 0)
+        {
+            cout << "Ati ales un cnp gresit. Doriti sa incercati din nou?";
+            int optiune;
+            cout << "\nAlegeti 0 pt nu, 1 pt da: ";
+            cin >> optiune;
+            if (optiune == 0) {
+                return false;
+            }
+            cout << "Alegeti cnp-ul porcului: ";
+        }
+    }
+    return true;
+}
+
+
+bool gasire_boxa_upgrade(const string marimeBoxa, vector<int>& nr)
+{
+    int i, ok = 0;
+    for (i = 0; i < Guitz.listaBoxe.size(); i++)
+    {
+        if (!Guitz.listaBoxe.at(i).tip.compare(marimeBoxa))
+        {
+            if (Guitz.listaBoxe.at(i).nrPorci < Guitz.nrMaxBoxePorci)
+            {
+                cout << Guitz.listaBoxe.at(i).cod << endl;
+                ok = 1;
+                nr.push_back(i);
+            }
+        }
+    }
+    if (!ok) {
+        cout << "Ne cerem scuze, toate boxele sunt ocupate!";
+        return false;
+    }
+    return true;
+}
+
+void istoric_update(string nrBoxa, int greutate, string data,int c,string BoxaVeche) {
+    ifstream isto;
+    isto.open("istoric.txt");
+    ofstream aux;
+    aux.open("auxiliar.txt");
+    string box, tip;
+    int nr, i;
+    int cnp, g;
+    string d,datavenirii;
+    char linie[250];
+
+    while (!isto.eof()) {
+        isto >> box >> tip >> nr;
+        if (!isto.eof()) {
+            if (!box.compare(nrBoxa)) {
+                aux << box << " " << tip << " " << nr + 1 << endl;
+                for (i = 0; i < nr; i++) {
+                    isto >> cnp >> g >> d;
+                    aux << cnp << " " << g << " " << d << endl;
+                }
+                aux << c << " " << greutate << " " << data << endl;
+                isto.ignore();
+                isto.getline(linie, 250);
+                while (strcmp(linie, "*"))
+                {
+                    aux << linie << endl; ////!!!!!!!!!!!!!
+                    isto.getline(linie, 250);
+                }
+                aux << "Am mutat animalul cnp: " << c << " in data de " << data << endl;
+                aux << "*" << endl;
+            }
+            else if (!box.compare(BoxaVeche)) {
+                aux << box << " " << tip << " " << nr - 1 << endl;
+                for (i = 0; i < nr; i++) {
+                    isto >> cnp >> g >> d;
+                    if (cnp != c)
+                        aux << cnp << " " << g << " " << d << endl;
+                    else
+                        datavenirii = d;
+                }
+                
+                isto.ignore();
+                isto.getline(linie, 250);
+                while (strcmp(linie, "*"))
+                {
+                    aux << linie << endl; ////!!!!!!!!!!!!!
+                    isto.getline(linie, 250);
+                }
+                aux << "Animalul cnp: " << c << " a crescut in data de " << data <<", data venirii: "<<datavenirii<< endl;
+                aux << "*" << endl;
+            }
+            else {
+                aux << box << " " << tip << " " << nr << endl;
+                //cout << box << " " << tip << " " << nr << endl;
+                for (i = 0; i < nr; i++) {
+                    isto >> cnp >> g >> d;
+                    aux << cnp << " " << g << " " << d << endl;
+                    //cout << cnp << " " << g << " " << d << endl;
+                }
+                isto.ignore();
+                isto.getline(linie, 250);
+                while (strcmp(linie, "*"))
+                {
+                    aux << linie << endl; ////!!!!!!!!!!!!!
+                    //cout << linie<<endl;
+                    isto.getline(linie, 250);
+                }
+                aux << "*" << endl;
+            }
+        }
+    }
+
+    isto.close();
+    aux.close();
+    char filename1[] = "istoric.txt";
+    char filename2[] = "auxiliar.txt";
+    if (remove(filename1) != 0)
+        perror("File deletion failed");
+    else
+        cout << "File deleted successfully";
+
+    if (rename(filename2, filename1) != 0)
+        perror("Error renaming file");
+    else
+        cout << "File renamed successfully";
+}
+
+void upgrade() {
+    system("cls");
+    cout << "Alegeti cnp-ul porcului: " << endl;
+    vector<int>coduri;
+    int i,j, c, ok = 0;
+    //in c ramane cnp ul porcului caruia vr sa i dau upgrade
+
+    map<int, int> harta;
+    //pastram in vectorul coduri cnp urile porcurilor pt a valida daca introduce un cnp corect
+    for (i = 0; i < Guitz.listaBoxe.size(); i++) {
+        if (!Guitz.listaBoxe.at(i).tip.compare("mic"))
+        {
+            for (j = 0; j < Guitz.listaBoxe.at(i).listaAnimale.size(); j++) {
+                c = Guitz.listaBoxe.at(i).listaAnimale.at(j).cnp;
+                coduri.push_back(c);
+                cout << c << " ";
+                harta.insert(pair<int, int>(c, i));
+            }
+            cout << endl;
+        }
+    }
+    if (!alegere_cnp(coduri, c))
+        return;
+
+    int maturitate;
+    cout << "Alegeti ce devine porcusorul: \n1. Porc\n2. Scroafa\nAlegerea dvs este: ";
+    cin >> maturitate;
+
+    //afisez boxele in care poate fi introdus un porc nou
+    vector <int>nr;
+    if (maturitate == 1)
+    {
+        if (!gasire_boxa_upgrade("mare", nr))
+            return;
+    }
+    else if (maturitate == 2) {
+        if (!gasire_boxa_upgrade("mediu", nr))
+            return;
+    }
+    else {
+        cout << "Nu ati ales o optiune valida. Reveniti in functie";
+        return;
+    }
+
+    int boxaaleasa = 0;
+    //transmit ca parametru vectorul de indexi si variabila in care stochez inputul de la tastaura(prin referinta)
+    if (!alegere_boxa(nr, boxaaleasa)) {
+        return;
+    }
+
+    //trebuie sa folosesc atributele de la animalul cu cnp ul ales
+    //ori salvez cumva boxa animalelor, ori fac alta functie de cautare a boxei in functie de cnp
+    float gr;
+    string mat,dp;
+    if (maturitate == 1)
+        mat = "mare";
+    else
+        mat = "mediu";
+    
+
+    cout << "Introduceti noua greutate: "; cin >> gr;
+    cout << "\nIntroduceti data de astazi: zi/luna/an "; cin >> dp;
+
+    Animale a(mat, c, gr, dp);
+    
+    Guitz.listaBoxe.at(boxaaleasa - 1).SetLista(a);
+
+    for (i = 0; i < Guitz.listaBoxe.at(harta[c]).listaAnimale.size(); i++)
+    {
+        if (Guitz.listaBoxe.at(harta[c]).listaAnimale.at(i).cnp == c) {
+        
+            Guitz.listaBoxe.at(harta[c]).StergePorc(c);
+            break;
+        }
+    }
+
+    if (maturitate == 1) {
+        Guitz.nrPorci++;
+    }
+    else
+        Guitz.nrScroafe++;
+
+    Guitz.nrPurcelusi--;
+    Guitz.listaBoxe.at(boxaaleasa - 1).nrPorci++;
+    Guitz.listaBoxe.at(harta[c]).nrPorci--;
+
+    registru_adaugare(Guitz.listaBoxe.at(boxaaleasa-1).cod, gr, dp,c);
+    registru_stergere(c, dp, Guitz.listaBoxe.at(harta[c]).cod);
+    istoric_update(Guitz.listaBoxe.at(boxaaleasa - 1).cod, gr, dp, c, Guitz.listaBoxe.at(harta[c]).cod);
+
 }
 
 void legenda_istoric(int& n) {
@@ -898,6 +1127,8 @@ void desenare() {
     int r1b = r2 / 2; //1
     int r1c = Guitz.nrBoxe / 2 - (r1a + r1b); //5-3=2
     int lungime = r1a * La + r1b * Lb + r1c * Lc + (r1a + r1b + r1c) * 3;
+    for (i = 0; i < lungime / 2; i++) cout << " ";
+    cout << "Schita halei noastre" << endl<<endl<<endl<<endl;
     sussus(r1a, La, r1b, Lb, r1c, Lc);
     ///
     /// A doua linie
@@ -1033,6 +1264,8 @@ void desenare() {
     cout << endl << endl;
     cout << endl << endl;
 
+    cout << Guitz;
+
     system("pause");
     
 }
@@ -1144,10 +1377,11 @@ void legenda(int&n) {
     cout << "\t\t\t\t\t\tMeniu " << endl;
     cout << "\t\t\t\t\t\t1) Adaugare animal" << endl;
     cout << "\t\t\t\t\t\t2) Eliberare animal" << endl;
-    cout << "\t\t\t\t\t\t3) Statistica dupa tipurile de boxe" << endl;
-    cout << "\t\t\t\t\t\t4) Istoric boxe" << endl;
-    cout << "\t\t\t\t\t\t5) Vizualizarea continut hala" << endl;
-    cout << "\t\t\t\t\t\t6) Vizualizarea artistica a animalelor" << endl;
+    cout << "\t\t\t\t\t\t3) Actualizare animal" << endl;
+    cout << "\t\t\t\t\t\t4) Statistica dupa tipurile de boxe" << endl;
+    cout << "\t\t\t\t\t\t5) Istoric boxe" << endl;
+    cout << "\t\t\t\t\t\t6) Vizualizarea continut hala" << endl;
+    cout << "\t\t\t\t\t\t7) Vizualizarea artistica a animalelor" << endl;
     cout << "\t\t\t\t\t\t0) Iesire";
     cout << endl;
     cout << " Optiunea dumneavoastra: ";
@@ -1159,12 +1393,13 @@ void meniu()
     legenda(n);
     while (n != 0)
     {
-        if (n == 1) inserare(); 
+        if (n == 1) inserare();
         else if (n == 2) stergere();
-        else if (n == 3) statisticaBoxe();
-        else if (n == 4) istoric();
-        else if (n == 6) artistic();
-        else if (n == 5) desenare();
+        else if (n == 3) upgrade();
+        else if (n == 4) statisticaBoxe();
+        else if (n == 5) istoric();
+        else if (n == 6) desenare();
+        else if (n == 7) artistic();
         else if (n == 0) break;
         else cout << "\n   Nu ati introdus o optiune valida";
 
@@ -1177,6 +1412,8 @@ int main()
 {
     initializareFerma();
     meniu();
+    //upgrade();
+    //cout <<Guitz;
 
 	return 0;
 }

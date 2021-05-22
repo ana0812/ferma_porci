@@ -27,5 +27,8 @@ public:
 	friend void istoric();
 	friend void statisticaBoxe();
 	friend void desenare();
+
+	//pt upgrade
+	friend void upgrade();
 };
 

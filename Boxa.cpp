@@ -24,7 +24,8 @@ void Boxa::StergePorc(int cnp)
 ostream& operator<<(ostream& os, const Boxa&b)
 {
 	// TODO: insert return statement here
-	os << "Tip: " << b.tip<<endl;
+	os << "\t\t\tCod boxa: "<<b.cod<< "; Tip boxa: " << b.tip<<endl;
+	os << "\t\t\tNumar porci din boxa" << b.nrPorci << endl;
 	if (b.listaAnimale.size()) {
 		for (int i = 0; i < b.listaAnimale.size(); i++) {
 			os << b.listaAnimale.at(i) << endl;
