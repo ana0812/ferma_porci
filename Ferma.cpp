@@ -1,7 +1,7 @@
 #include "Ferma.h"
 
 Ferma::Ferma(int nrScr, int nrPor, int nrPurc, int nrB, int n)
-	:nume("Guitz-Guitz"), locatie("Timisoara"), nrScroafe(nrScr), nrPorci(nrPor), nrPurcelusi(nrPurc), nrBoxe(nrB), nrMaxBoxePorci(n)
+	:nume("Puff-Farm"), locatie("Strada Fericirii"), nrScroafe(nrScr), nrPorci(nrPor), nrPurcelusi(nrPurc), nrBoxe(nrB), nrMaxBoxePorci(n)
 {}
 
 Ferma::Ferma(const Ferma&f)
